@@ -17,7 +17,7 @@ async function api(url, options) {
   return payload;
 }
 
-function addMessage(role, text, sources = []) {
+function addMessage(role, text, sources = [], ticketId = '') {
   const row = document.createElement('div');
   row.className = `message ${role === 'user' ? 'user' : 'assistant'} ${role}`;
   const avatar = document.createElement('div');
@@ -25,6 +25,16 @@ function addMessage(role, text, sources = []) {
   avatar.textContent = role === 'user' ? 'Вы' : role === 'manager' ? 'М' : '✳';
   const content = document.createElement('div');
   content.className = 'message-content';
+  if (ticketId) {
+    const ticket = document.createElement('div');
+    ticket.className = 'message-ticket';
+    const label = document.createElement('span');
+    label.textContent = 'Обращение создано';
+    const number = document.createElement('strong');
+    number.textContent = ticketId;
+    ticket.append(label, number);
+    content.append(ticket);
+  }
   const paragraph = document.createElement('p');
   paragraph.textContent = text;
   content.append(paragraph);
@@ -52,8 +62,8 @@ function renderState(state) {
   if (signature === shownSignature) return;
   shownSignature = signature;
   messages.replaceChildren();
-  if (!state.messages.length) addMessage('assistant', 'Здравствуйте! Спросите меня о продукте. Если понадобится специалист, напишите «позови агента».');
-  for (const item of state.messages) addMessage(item.role, item.text, item.sources || []);
+  if (!state.messages.length) addMessage('assistant', 'Здравствуйте! Спросите меня о продукте. Если понадобится оператор, напишите «позови оператора».');
+  for (const item of state.messages) addMessage(item.role, item.text, item.sources || [], item.ticketId);
 }
 
 async function refresh() {
@@ -85,7 +95,7 @@ async function ask(question) {
   addMessage('user', text);
   const pending = document.createElement('div');
   pending.className = 'pending-answer';
-  pending.textContent = activeTicket ? 'Передаю сообщение специалисту…' : 'Ищу ответ…';
+  pending.textContent = activeTicket ? 'Передаю сообщение оператору…' : /позови оператора/i.test(text) ? 'Создаю обращение…' : 'Ищу ответ…';
   messages.append(pending);
   messages.scrollTop = messages.scrollHeight;
   try {

@@ -14,7 +14,7 @@ test('operator request recognizes paraphrases without escalating product questio
   assert.equal(wantsHuman('Свяжите меня с человеком'), true);
   assert.equal(wantsHuman('Хочу поговорить с оператором'), true);
   assert.equal(wantsHuman('Позови оператора'), true);
-  assert.equal(wantsHuman('Позови агента'), true);
+  assert.equal(wantsHuman('Позови агента'), false);
   assert.equal(wantsHuman('Как настроить Telegram?'), false);
   assert.equal(wantsHuman('Есть ли в продукте поддержка?'), false);
 });
@@ -34,7 +34,7 @@ test('visitor escalates a conversation; manager sees it, replies, and closes it'
     const landing = await fetch(address);
     assert.equal(landing.status, 200);
     const html = await landing.text();
-    assert.match(html, /позови агента/);
+    assert.match(html, /позови оператора/);
     assert.doesNotMatch(html, /call-operator|демо-чат|Как это устроено/i);
     assert.doesNotMatch(html, /ticket-select/);
     assert.equal((await fetch(`${address}/admin`)).status, 200);
@@ -53,10 +53,14 @@ test('visitor escalates a conversation; manager sees it, replies, and closes it'
     assert.equal((await fetch(`${address}/api/admin/tickets?project=invest-manager`)).status, 401);
     assert.equal((await post('/api/admin/login', { password: 'wrong' })).status, 401);
 
-    const escalation = await post('/api/chat', { projectId: 'invest-manager', question: 'Позови агента' }, visitorCookie);
+    const escalation = await post('/api/chat', { projectId: 'invest-manager', question: 'Позови оператора' }, visitorCookie);
     assert.equal(escalation.status, 200);
     const ticketId = escalation.payload.ticket.id;
     assert.match(ticketId, /^PS-/);
+    assert.match(escalation.payload.answer, new RegExp(ticketId));
+    const createdStateResponse = await fetch(`${address}/api/public/state?project=invest-manager`, { headers: { Cookie: visitorCookie } });
+    const createdState = await createdStateResponse.json();
+    assert.ok(createdState.messages.some((message) => message.role === 'assistant' && message.ticketId === ticketId));
     const unauthorizedDetail = await fetch(`${address}/api/admin/ticket?project=invest-manager&id=${ticketId}`);
     assert.equal(unauthorizedDetail.status, 401);
     assert.equal((await post('/api/admin/reply', { projectId: 'invest-manager', ticketId, text: 'Нет доступа' })).status, 401);

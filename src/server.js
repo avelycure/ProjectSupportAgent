@@ -57,7 +57,7 @@ function configuredAdmin() {
   return CONFIG.adminPassword.length >= 12 && CONFIG.adminPassword !== 'replace-with-a-long-random-password';
 }
 export function wantsHuman(text) {
-  return /(?:позов|приглас|соедин|свяж|связ|переключ|передай|перевед|поговор|подключ).{0,45}(?:агент|оператор|менеджер|человек|поддержк)|(?:хочу|нужен|нужна|дайте|требуется).{0,45}(?:агент|оператор|менеджер|человек)|^(?:оператор|живой человек)[.!?\s]*$|(?:human agent|talk to (?:a )?person|contact support)/i.test(text);
+  return /(?:позов|приглас|соедин|свяж|связ|переключ|передай|перевед|поговор|подключ).{0,45}(?:оператор|менеджер|человек|поддержк)|(?:хочу|нужен|нужна|дайте|требуется).{0,45}(?:оператор|менеджер|человек)|^(?:оператор|живой человек)[.!?\s]*$|(?:human agent|talk to (?:a )?person|contact support)/i.test(text);
 }
 function sameOrigin(req) {
   const origin = req.headers.origin;

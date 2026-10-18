@@ -7,10 +7,17 @@ import { closeCrm } from '../src/mcp-client.js';
 
 test('cloud request contains retrieved docs and selected MCP ticket, not every ticket', async () => {
   let request;
+  let attempts = 0;
   const mock = http.createServer(async (req, res) => {
     let raw = '';
     for await (const chunk of req) raw += chunk;
     request = JSON.parse(raw);
+    attempts += 1;
+    if (attempts === 1) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: { message: "Unsupported parameter: 'max_tokens' is not supported with this model" } }));
+      return;
+    }
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ choices: [{ message: { content: 'Проверьте ограничение Telegram. [faq.md]' } }] }));
   });
@@ -22,6 +29,8 @@ test('cloud request contains retrieved docs and selected MCP ticket, not every t
   try {
     const answer = await answerQuestion({ projectId: 'invest-manager', ticketId: 'IM-101', question: 'Почему не работает Telegram?' });
     assert.equal(answer.mode, 'cloud-rag');
+    assert.equal(attempts, 2);
+    assert.equal(request.max_completion_tokens, 800);
     assert.match(answer.answer, /Telegram/);
     assert.match(request.messages[1].content, /IM-101/);
     assert.match(request.messages[1].content, /faq.md/);

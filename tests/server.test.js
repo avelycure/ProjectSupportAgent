@@ -2,8 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from '../src/server.js';
 import { closeCrm } from '../src/mcp-client.js';
+import { CONFIG } from '../src/config.js';
 
 test('landing and chat API respond with grounded demo content', async () => {
+  const cloudApiKey = CONFIG.cloudApiKey;
+  CONFIG.cloudApiKey = '';
   const server = createServer();
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const address = `http://127.0.0.1:${server.address().port}`;
@@ -19,6 +22,7 @@ test('landing and chat API respond with grounded demo content', async () => {
     assert.ok(payload.sources.length > 0);
     assert.match(payload.answer, /Telegram|тикету/i);
   } finally {
+    CONFIG.cloudApiKey = cloudApiKey;
     await new Promise((resolve) => server.close(resolve));
     await closeCrm();
   }

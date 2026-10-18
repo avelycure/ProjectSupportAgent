@@ -4,3 +4,5 @@ node_modules/
 projects/*/data/private/
 projects/*/data/*.local.json
 coverage/
+var/
+secrets/.env

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Менеджер · Project Support Agent</title><link rel="stylesheet" href="/styles.css"></head>
+<body class="admin-body">
+  <header class="site-header wrap"><a class="brand" href="/" aria-label="На сайт"><span class="brand-mark">✳</span><span>project<span class="brand-accent">support</span><small>manager</small></span></a><a class="header-cta" href="/">← Сайт для пользователей</a></header>
+  <main class="admin-main wrap">
+    <div class="admin-intro"><span class="kicker">РАБОЧЕЕ МЕСТО МЕНЕДЖЕРА</span><h1>Обращения <em>без потерь.</em></h1><p>Здесь появляются диалоги, которые пользователи передали оператору. Откройте тикет, прочитайте контекст и ответьте прямо в чат пользователя.</p></div>
+    <section id="login-panel" class="admin-login" aria-labelledby="login-title"><div class="login-symbol">⌘</div><h2 id="login-title">Вход для менеджера</h2><p>Пароль хранится только в локальном файле <code>secrets/.env</code>.</p><form id="login-form"><label for="admin-password">Пароль менеджера</label><input id="admin-password" type="password" autocomplete="current-password" required><button type="submit" class="button button-primary">Войти ↗</button></form><p id="login-error" class="form-error" role="alert"></p></section>
+    <section id="manager-panel" class="manager-panel" hidden>
+      <div class="manager-toolbar"><div><span class="kicker">ОЧЕРЕДЬ ПОДДЕРЖКИ</span><h2>Тикеты</h2></div><div class="manager-actions"><label for="admin-project">Проект</label><select id="admin-project"></select><button id="refresh-tickets" type="button">Обновить</button><button id="logout" type="button">Выйти</button></div></div>
+      <div class="manager-grid"><aside class="ticket-list-panel"><div class="ticket-list-heading"><strong>Обращения</strong><span id="ticket-count">0</span></div><div id="ticket-list" class="ticket-list" role="list"></div></aside>
+        <div class="ticket-detail"><div class="ticket-detail-head"><div><span class="kicker" id="ticket-id">ВЫБЕРИТЕ ТИКЕТ</span><h3 id="ticket-title">История диалога</h3><p id="ticket-meta">Здесь появится переписка пользователя с агентом и менеджером.</p></div><span id="ticket-status" class="status-pill" hidden></span></div><div id="ticket-messages" class="ticket-messages" role="log"></div><form id="reply-form" class="reply-form" hidden><label for="reply-input">Ответ пользователю</label><textarea id="reply-input" rows="3" maxlength="2000" placeholder="Напишите ответ, который появится в чате пользователя…" required></textarea><div class="reply-actions"><span id="reply-feedback" role="status"></span><button type="submit" class="button button-primary">Отправить ответ ↗</button><button id="close-ticket" type="button" class="button button-ghost">Закрыть тикет</button></div></form></div></div>
+    </section>
+  </main>
+  <script src="/admin.js" defer></script>
+</body>
+</html>

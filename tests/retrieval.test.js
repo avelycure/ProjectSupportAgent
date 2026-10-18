@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getProject, getTicket } from '../src/projects.js';
+import { getProject } from '../src/projects.js';
+import { getTicket } from '../src/store.js';
 import { retrieve } from '../src/retrieval.js';
 
 test('retrieval finds Telegram troubleshooting in the demo project', async () => {
@@ -12,5 +13,5 @@ test('retrieval finds Telegram troubleshooting in the demo project', async () =>
 
 test('project IDs cannot escape the projects directory', async () => {
   await assert.rejects(() => getProject('../invest-manager'), /Некорректный/);
-  assert.equal(await getTicket('invest-manager', '../IM-101'), undefined);
+  assert.equal(await getTicket('invest-manager', '../IM-101'), null);
 });

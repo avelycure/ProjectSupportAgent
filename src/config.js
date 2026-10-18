@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 function readDotEnv() {
-  const file = path.join(ROOT, '.env');
+  const file = path.join(ROOT, 'secrets', '.env');
   if (!fs.existsSync(file)) return;
   for (const line of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
     const match = line.match(/^([A-Z][A-Z0-9_]*)=(.*)$/);
@@ -23,4 +23,6 @@ export const CONFIG = {
   cloudBaseUrl: process.env.CLOUD_BASE_URL || 'https://api.openai.com/v1',
   cloudModel: process.env.CLOUD_MODEL || 'gpt-4.1-mini',
   cloudApiKey: process.env.CLOUD_API_KEY || '',
+  adminPassword: process.env.ADMIN_PASSWORD || '',
+  dataDir: process.env.SUPPORT_DATA_DIR || path.join(ROOT, 'var'),
 };

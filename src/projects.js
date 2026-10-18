@@ -25,27 +25,6 @@ export async function getProject(projectId) {
   return project;
 }
 
-export async function listTickets(projectId) {
-  await getProject(projectId);
-  const tickets = await json(path.join(PROJECTS_DIR, projectId, 'data', 'tickets.json'));
-  if (!Array.isArray(tickets)) throw new Error('Некорректный файл тикетов');
-  return tickets.map(({ id, title, status, category }) => ({ id, title, status, category }));
-}
-
-export async function getTicket(projectId, ticketId) {
-  if (typeof ticketId !== 'string' || !/^[A-Za-z0-9-]{1,64}$/.test(ticketId)) return undefined;
-  await getProject(projectId);
-  const tickets = await json(path.join(PROJECTS_DIR, projectId, 'data', 'tickets.json'));
-  return Array.isArray(tickets) ? tickets.find((ticket) => ticket.id === ticketId) : undefined;
-}
-
-export async function getUser(projectId, userId) {
-  if (typeof userId !== 'string' || !/^[A-Za-z0-9-]{1,64}$/.test(userId)) return undefined;
-  await getProject(projectId);
-  const users = await json(path.join(PROJECTS_DIR, projectId, 'data', 'users.json'));
-  return Array.isArray(users) ? users.find((user) => user.id === userId) : undefined;
-}
-
 export async function loadDocuments(projectId) {
   await getProject(projectId);
   const directories = [

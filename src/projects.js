@@ -27,14 +27,9 @@ export async function getProject(projectId) {
 
 export async function loadDocuments(projectId) {
   await getProject(projectId);
-  const directories = [
-    { directory: path.join(PROJECTS_DIR, projectId, 'docs'), prefix: '' },
-    { directory: path.join(ROOT, 'docs'), prefix: 'agent/' },
-  ];
-  const documents = (await Promise.all(directories.map(async ({ directory, prefix }) => {
-    const entries = await readdir(directory, { withFileTypes: true });
-    return Promise.all(entries.filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
-      .map(async (entry) => ({ source: `${prefix}${entry.name}`, text: await readFile(path.join(directory, entry.name), 'utf8') })));
-  }))).flat();
+  const directory = path.join(PROJECTS_DIR, projectId, 'docs');
+  const entries = await readdir(directory, { withFileTypes: true });
+  const documents = await Promise.all(entries.filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+    .map(async (entry) => ({ source: entry.name, text: await readFile(path.join(directory, entry.name), 'utf8') })));
   return documents.sort((a, b) => a.source.localeCompare(b.source));
 }

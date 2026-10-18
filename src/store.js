@@ -72,10 +72,10 @@ export async function createTicket(projectId, sessionId, requestText) {
     const current = session(state, sessionId);
     if (current.activeTicketId) return addUserMessageToState(state, current, requestText);
     const id = `PS-${randomUUID().slice(0, 8).toUpperCase()}`;
-    const confirmation = `Передал разговор оператору. Номер обращения: ${id}. Напишите здесь дополнительные детали — менеджер увидит их и ответит в этом чате.`;
+    const confirmation = `Передал разговор специалисту. Номер обращения: ${id}. Напишите здесь дополнительные детали — менеджер увидит их и ответит в этом чате.`;
     current.messages.push(line('user', requestText), line('assistant', confirmation));
     const previousQuestion = [...current.messages].reverse().find((message) => message.role === 'user' && message.text !== requestText)?.text;
-    const title = /^позови оператора[.!?\s]*$/i.test(requestText) ? previousQuestion || 'Запрос оператора' : requestText;
+    const title = /^позови (?:агента|оператора)[.!?\s]*$/i.test(requestText) ? previousQuestion || 'Запрос специалиста' : requestText;
     const ticket = { id, projectId, sessionId, status: 'open', title: title.slice(0, 100), createdAt: now(), updatedAt: now(), messages: [...current.messages] };
     state.tickets[id] = ticket;
     current.activeTicketId = id;
@@ -90,7 +90,7 @@ function addUserMessageToState(state, current, text) {
   ticket.messages.push(message);
   current.messages.push(message);
   ticket.updatedAt = message.at;
-  return { ticket: { id: ticket.id, status: ticket.status }, answer: 'Сообщение передано оператору.' };
+  return { ticket: { id: ticket.id, status: ticket.status }, answer: 'Сообщение передано специалисту.' };
 }
 
 export async function addUserMessage(projectId, sessionId, text) {

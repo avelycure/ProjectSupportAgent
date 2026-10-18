@@ -4,10 +4,11 @@ import { getProject } from '../src/projects.js';
 import { getTicket } from '../src/store.js';
 import { retrieve } from '../src/retrieval.js';
 
-test('retrieval finds Telegram troubleshooting in the demo project', async () => {
+test('retrieval finds Telegram troubleshooting only in product documentation', async () => {
   const hits = await retrieve('invest-manager', 'Почему не работает вход в Telegram после превышения попыток?');
   assert.ok(hits.length > 0);
   assert.ok(hits.some((hit) => /telegram|faq/i.test(hit.source)));
+  assert.ok(hits.every((hit) => !hit.source.startsWith('agent/')));
   assert.ok(hits[0].score > 0);
 });
 

@@ -57,7 +57,7 @@ function configuredAdmin() {
   return CONFIG.adminPassword.length >= 12 && CONFIG.adminPassword !== 'replace-with-a-long-random-password';
 }
 export function wantsHuman(text) {
-  return /(?:позов|приглас|соедин|свяж|связ|переключ|передай|перевед|поговор).{0,45}(?:оператор|менеджер|человек|поддержк)|(?:хочу|нужен|нужна|дайте|требуется).{0,45}(?:оператор|менеджер|человек)|^(?:оператор|живой человек)[.!?\s]*$|(?:human agent|talk to (?:a )?person|contact support)/i.test(text);
+  return /(?:позов|приглас|соедин|свяж|связ|переключ|передай|перевед|поговор|подключ).{0,45}(?:агент|оператор|менеджер|человек|поддержк)|(?:хочу|нужен|нужна|дайте|требуется).{0,45}(?:агент|оператор|менеджер|человек)|^(?:оператор|живой человек)[.!?\s]*$|(?:human agent|talk to (?:a )?person|contact support)/i.test(text);
 }
 function sameOrigin(req) {
   const origin = req.headers.origin;
@@ -82,7 +82,7 @@ export function createServer() {
         const sessionId = visitor(req, res);
         return json(res, 200, await crmCall('get_session', { projectId: url.searchParams.get('project') || '', sessionId }));
       }
-      if (req.method === 'POST' && ['/api/chat', '/api/escalate'].includes(url.pathname)) {
+      if (req.method === 'POST' && url.pathname === '/api/chat') {
         const { projectId, question } = await body(req);
         if (typeof question !== 'string' || !question.trim() || question.length > 2000) throw new Error('Введите вопрос длиной до 2000 символов');
         const sessionId = visitor(req, res);
@@ -91,7 +91,7 @@ export function createServer() {
           const result = await crmCall('add_user_message', { projectId, sessionId, text: question.trim() });
           return json(res, 200, { ...result, mode: 'operator', sources: [] });
         }
-        if (url.pathname === '/api/escalate' || wantsHuman(question)) {
+        if (wantsHuman(question)) {
           const result = await crmCall('create_ticket', { projectId, sessionId, requestText: question.trim() });
           return json(res, 200, { ...result, mode: 'operator', sources: [] });
         }

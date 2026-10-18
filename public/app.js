@@ -6,7 +6,6 @@ const messages = document.querySelector('#chat-messages');
 const form = document.querySelector('#chat-form');
 const input = document.querySelector('#chat-input');
 const submit = form.querySelector('button');
-const operatorButton = document.querySelector('#call-operator');
 let activeTicket = null;
 let busy = false;
 let shownSignature = '';
@@ -29,10 +28,11 @@ function addMessage(role, text, sources = []) {
   const paragraph = document.createElement('p');
   paragraph.textContent = text;
   content.append(paragraph);
-  if (sources.length) {
+  const productSources = sources.filter((source) => !source.source.startsWith('agent/'));
+  if (productSources.length) {
     const list = document.createElement('div');
     list.className = 'message-sources';
-    for (const source of sources) {
+    for (const source of productSources) {
       const label = document.createElement('span');
       label.textContent = `${source.source} · ${source.heading}`;
       list.append(label);
@@ -46,14 +46,13 @@ function addMessage(role, text, sources = []) {
 
 function renderState(state) {
   activeTicket = state.ticket;
-  contextTitle.textContent = activeTicket ? `Обращение ${activeTicket.id}` : 'Агент на связи';
-  contextDescription.textContent = activeTicket ? 'Оператор видит историю диалога. Его ответ появится здесь.' : 'Ответы основаны на документации выбранного проекта.';
-  operatorButton.hidden = Boolean(activeTicket);
+  contextTitle.textContent = activeTicket ? `Обращение ${activeTicket.id}` : 'Помощник на связи';
+  contextDescription.textContent = activeTicket ? 'Специалист видит историю диалога. Его ответ появится здесь.' : 'Задайте вопрос о выбранном продукте.';
   const signature = JSON.stringify(state.messages);
   if (signature === shownSignature) return;
   shownSignature = signature;
   messages.replaceChildren();
-  if (!state.messages.length) addMessage('assistant', 'Здравствуйте! Спросите меня о продукте. Если понадобится человек, напишите «позови оператора».');
+  if (!state.messages.length) addMessage('assistant', 'Здравствуйте! Спросите меня о продукте. Если понадобится специалист, напишите «позови агента».');
   for (const item of state.messages) addMessage(item.role, item.text, item.sources || []);
 }
 
@@ -69,7 +68,7 @@ async function initialize() {
     projectSelect.replaceChildren();
     for (const project of projects) projectSelect.add(new Option(project.name, project.id));
     if (!projects.length) throw new Error('Добавьте проект в папку projects');
-    chatStatus.textContent = status.modelConfigured ? `Облачная модель ${status.model} · локальный RAG` : 'Поиск по документации · модель не настроена';
+    chatStatus.textContent = status.modelConfigured ? 'Помощник на связи' : 'Поиск по справке доступен';
     await refresh();
   } catch (error) {
     chatStatus.textContent = 'Сервис недоступен';
@@ -77,21 +76,20 @@ async function initialize() {
   }
 }
 
-async function ask(question, escalate = false) {
+async function ask(question) {
   const text = question.trim();
   if (!text || busy || !projectSelect.value) return;
   busy = true;
   submit.disabled = true;
-  operatorButton.disabled = true;
   input.value = '';
   addMessage('user', text);
   const pending = document.createElement('div');
   pending.className = 'pending-answer';
-  pending.textContent = activeTicket || escalate ? 'Передаю сообщение…' : 'Ищу ответ в документации…';
+  pending.textContent = activeTicket ? 'Передаю сообщение специалисту…' : 'Ищу ответ…';
   messages.append(pending);
   messages.scrollTop = messages.scrollHeight;
   try {
-    await api(escalate ? '/api/escalate' : '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    await api('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ projectId: projectSelect.value, question: text }) });
     pending.remove();
     busy = false;
@@ -99,13 +97,11 @@ async function ask(question, escalate = false) {
   } catch (error) {
     pending.remove();
     addMessage('assistant', `Не удалось отправить: ${error.message}`);
-  } finally { busy = false; submit.disabled = false; operatorButton.disabled = false; input.focus(); }
+  } finally { busy = false; submit.disabled = false; input.focus(); }
 }
 
 form.addEventListener('submit', (event) => { event.preventDefault(); void ask(input.value); });
 input.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
 projectSelect.addEventListener('change', () => { shownSignature = ''; void refresh(); });
-operatorButton.addEventListener('click', () => { void ask('Позови оператора', true); });
-document.querySelectorAll('[data-question]').forEach((button) => button.addEventListener('click', () => { void ask(button.dataset.question); }));
 setInterval(() => { void refresh().catch(() => {}); }, 5000);
 void initialize();

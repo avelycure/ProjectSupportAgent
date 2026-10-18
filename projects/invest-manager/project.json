@@ -1,0 +1,8 @@
+{
+  "id": "invest-manager",
+  "name": "Invest Manager",
+  "description": "Плагин Obsidian для инвестиционной сводки и новостей по портфелю.",
+  "productUrl": "https://github.com/avelycure/InvestManager",
+  "language": "ru",
+  "demo": true
+}

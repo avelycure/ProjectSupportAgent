@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Project Support Agent — локальная поддержка любого продукта с документацией, RAG и контекстом тикета через MCP.">
+  <title>Project Support Agent — ответы с контекстом</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header wrap">
+    <a class="brand" href="#top" aria-label="Project Support Agent, наверх"><span class="brand-mark">✳</span><span>project<span class="brand-accent">support</span><small>agent</small></span></a>
+    <nav aria-label="Основная навигация"><a href="#how">Как работает</a><a href="#architecture">Архитектура</a><a href="#demo">Демо</a><a href="#docs">Документация</a></nav>
+    <a class="header-cta" href="#demo">Попробовать <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> ЛОКАЛЬНЫЙ СЕРВИС · ОБЛАЧНАЯ МОДЕЛЬ</div>
+        <h1>Поддержка, которая<br><em>знает ваш продукт.</em></h1>
+        <p class="hero-lead">Один агент для разных проектов. Он находит ответ в документации, запрашивает контекст тикета через MCP и объясняет решение с указанием источников.</p>
+        <div class="hero-actions"><a class="button button-primary" href="#demo">Открыть демо-чат <span aria-hidden="true">↗</span></a><a class="button button-ghost" href="#how">Как это устроено <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-note">Работает на <strong>127.0.0.1</strong>. Данные CRM остаются в JSON на вашем компьютере. Для связного ответа нужен ключ облачной модели.</p>
+      </div>
+      <div class="hero-visual" aria-label="Схема ответа агента">
+        <div class="signal signal-a">01 <span>Вопрос пользователя</span></div>
+        <div class="signal signal-b">02 <span>Фрагменты документации</span></div>
+        <div class="signal signal-c">03 <span>Тикет через MCP</span></div>
+        <div class="core"><div class="core-orbit"></div><span class="core-icon">✳</span><strong>Ответ<br>с опорой<br>на факты</strong></div>
+        <div class="signal signal-d"><span class="signal-dot"></span> ИСТОЧНИКИ ПРИЛОЖЕНЫ</div>
+        <span class="hero-grid" aria-hidden="true"></span>
+      </div>
+    </section>
+
+    <section class="proof-strip"><div class="wrap proof-inner"><span>Любой проект <b>↗</b></span><span>Markdown-документация <b>↗</b></span><span>JSON CRM через MCP <b>↗</b></span><span>Локальный запуск <b>↗</b></span></div></section>
+
+    <section class="section wrap" id="how">
+      <div class="section-head"><span class="kicker">01 / ПРИНЦИП РАБОТЫ</span><h2>От вопроса до ответа —<br><em>без догадок.</em></h2><p>Агент связывает вопрос с тем, что уже известно о продукте и конкретном обращении.</p></div>
+      <div class="steps">
+        <article class="step"><span class="step-num">01</span><div class="step-icon">▤</div><h3>Ищет в документации</h3><p>Разбивает Markdown по разделам и отбирает подходящие фрагменты локальным поиском BM25. Проект можно сменить одним выбором.</p></article>
+        <article class="step"><span class="step-num">02</span><div class="step-icon">⌘</div><h3>Сверяется с CRM</h3><p>Через локальный MCP-сервер получает выбранный тикет, его историю и сведения о пользователе из JSON.</p></article>
+        <article class="step"><span class="step-num">03</span><div class="step-icon">✳</div><h3>Даёт проверяемый ответ</h3><p>Облачная модель получает только найденные фрагменты и контекст выбранного тикета. Ответ показывает файлы-источники и отделяет факты от предположений.</p></article>
+      </div>
+    </section>
+
+    <section class="architecture" id="architecture"><div class="wrap architecture-grid"><div><span class="kicker">02 / АРХИТЕКТУРА</span><h2>Один движок.<br><em>Разные продукты.</em></h2><p>Каждый проект — отдельная папка с описанием, документацией, пользователями и тикетами. Для нового продукта достаточно добавить его файлы: код агента остаётся общим.</p><div class="architecture-callout"><span>✓</span><p><strong>Демо-проект: Invest Manager</strong><br>Примеры обращений про Telegram, RSS и связанные заметки. Все пользователи и тикеты в демо вымышлены.</p></div></div><div class="code-panel"><div class="code-top"><span class="code-dots">● ● ●</span><span>projects/&lt;project-id&gt;/</span></div><pre><code>project.json          <span># имя и описание</span>
+docs/
+  faq.md              <span># ответы на вопросы</span>
+  overview.md         <span># описание продукта</span>
+  troubleshooting.md  <span># диагностика</span>
+data/
+  users.json          <span># контекст пользователя</span>
+  tickets.json        <span># история обращений</span></code></pre><div class="code-bottom">MCP tools: <b>list_projects</b> · <b>list_tickets</b> · <b>get_ticket</b> · <b>get_user</b></div></div></div></section>
+
+    <section class="demo-section wrap" id="demo">
+      <div class="section-head demo-head"><span class="kicker">03 / ИНТЕРАКТИВНОЕ ДЕМО</span><h2>Спросите агента <em>сами.</em></h2><p>Выберите тикет, чтобы ответ учитывал его историю. Или задайте общий вопрос о продукте без тикета.</p></div>
+      <div class="demo-grid">
+        <aside class="demo-sidebar"><div class="sidebar-heading"><span class="sidebar-icon">✳</span><div><strong>Контекст ответа</strong><small>Подключён через MCP</small></div></div><label for="project-select">Проект</label><select id="project-select" aria-label="Проект"><option>Загрузка…</option></select><label for="ticket-select">Тикет</label><select id="ticket-select" aria-label="Тикет"><option value="">Без тикета</option></select><div class="context-card"><span class="context-label">АКТИВНЫЙ КОНТЕКСТ</span><strong id="context-title">Общий вопрос</strong><p id="context-description">Агент использует документацию выбранного проекта.</p></div><div class="privacy-line"><span>⌁</span><p>CRM и поиск работают локально. При настроенном облачном API выбранные фрагменты передаются модели.</p></div></aside>
+        <div class="chat-panel"><div class="chat-header"><div class="chat-avatar">✳</div><div><strong>Project Support Agent</strong><small id="chat-status">Проверяю подключение…</small></div><span class="chat-live" aria-hidden="true"></span></div><div id="chat-messages" class="chat-messages" role="log" aria-live="polite"><div class="message assistant"><div class="message-avatar">✳</div><div class="message-content"><p>Привет! Я отвечаю по документации проекта и могу учитывать выбранный тикет. Спросите, например, почему не работает вход в Telegram или как устроена сводка Invest Manager.</p></div></div></div><div class="suggestions" aria-label="Примеры вопросов"><button type="button" data-question="Почему не работает вход в Telegram?">Почему не работает Telegram?</button><button type="button" data-question="Почему в RSS неполный охват 24 часов?">Что с RSS за 24 часа?</button><button type="button" data-question="Как добавить новый проект?">Как добавить проект?</button></div><form id="chat-form" class="chat-form"><label class="sr-only" for="chat-input">Ваш вопрос</label><textarea id="chat-input" rows="2" maxlength="2000" placeholder="Спросите о продукте или выбранном тикете…"></textarea><button type="submit" aria-label="Отправить вопрос">↗</button></form><div class="chat-foot">Ответы опираются на документацию. Демо-тикеты вымышлены.</div></div>
+      </div>
+    </section>
+
+    <section class="docs-section" id="docs"><div class="wrap docs-grid"><div><span class="kicker">04 / ДОКУМЕНТАЦИЯ</span><h2>Понятно, как<br><em>устроен агент.</em></h2><p>В репозитории описаны запуск, архитектура, MCP-интерфейс, формат проектов, поток данных и правила безопасности.</p></div><div class="docs-list"><a href="https://github.com/avelycure/ProjectSupportAgent#readme" target="_blank" rel="noopener noreferrer"><span>README</span><small>Запуск и настройка</small><b>↗</b></a><a href="https://github.com/avelycure/ProjectSupportAgent/blob/main/docs/architecture.md" target="_blank" rel="noopener noreferrer"><span>Архитектура</span><small>RAG, MCP, чат</small><b>↗</b></a><a href="https://github.com/avelycure/ProjectSupportAgent/blob/main/docs/project-format.md" target="_blank" rel="noopener noreferrer"><span>Формат проекта</span><small>Добавить свой продукт</small><b>↗</b></a><a href="https://github.com/avelycure/ProjectSupportAgent/blob/main/docs/security.md" target="_blank" rel="noopener noreferrer"><span>Безопасность</span><small>Что отправляется в облако</small><b>↗</b></a></div></div></section>
+  </main>
+  <footer class="site-footer wrap"><div class="brand"><span class="brand-mark">✳</span><span>project<span class="brand-accent">support</span><small>agent</small></span></div><p>Открытая основа для поддержки разных продуктов.</p><a href="https://github.com/avelycure/ProjectSupportAgent" target="_blank" rel="noopener noreferrer">Код на GitHub ↗</a></footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>
